@@ -2,17 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --text-light: #0b0c18;
+  --background-light: #e8e9f7;
+  --primary-light: #191d67;
+  --secondary-light: #757be6;
+  --accent-light: #141db8;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --text-dark: #e7e8f4;
+  --background-dark: #080917;
+  --primary-dark: #989ce6;
+  --secondary-dark: #191f8a;
+  --accent-dark: #4750eb;
+
+  --font-body: "Roboto", sans-serif;
+  --font-headings: "Inter", sans-serif;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+html, body, #root, .App {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+}
+
+/* Base styles for light and dark modes */
+body.light-mode {
+  color: var(--text-light);
+  background-color: var(--background-light);
+}
+
+body.dark-mode {
+  color: var(--text-dark);
+  background-color: black;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headings);
+}
+
+/* Icon colors */
+.icon {
+  color: var(--primary-light);
+}
+
+body.dark-mode .icon {
+  color: var(--primary-dark);
+}
+
+/* SideNav styling */
+body.light-mode aside {
+  background-color: white;
+  color: #080917;
+}
+
+body.dark-mode aside {
+  background-color: var(--background-dark);
+  color: white;
+}
+
+/* LGU icon specific color */
+.text-primary-light {
+  color: var(--primary-light);
+}
+
+.text-primary-dark {
+  color: var(--primary-dark);
+}
+
+/* Hover effects */
+a:hover {
+  background-color: var(--secondary-light);
+}
+
+body.dark-mode a:hover {
+  background-color: var(--secondary-light);
+}
+
+/* Icon border on hover */
+a span:hover {
+  border-color: var(--accent-light);
+}
+
+body.dark-mode a span:hover {
+  border-color: var(--accent-dark);
 }
