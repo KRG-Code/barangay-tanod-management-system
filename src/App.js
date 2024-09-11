@@ -1,22 +1,20 @@
-import './App.css';
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
-import SignupPage from './pages/Signup';
-import LoginPage from './pages/Login';
-import Homepage from './pages/Homepage';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+const SignupPage = lazy(() => import('./pages/Signup'));
+const LoginPage = lazy(() => import('./pages/Login'));
+const Homepage = lazy(() => import('./pages/Homepage'));
 
 function App() {
   return (
     <div className="flex-1 p-6 bg-background text-text">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/Homepage" element={<Homepage />} />
-        </Routes>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/Homepage" element={<Homepage />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </div>
   );

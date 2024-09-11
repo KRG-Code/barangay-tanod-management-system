@@ -1,99 +1,34 @@
 /* Base styles for light and dark modes */
 body.light-mode .navIcon {
-    color: var(--primary-light);
-  }
-  
-  body.dark-mode .navIcon {
-    color: var(--primary-dark);
-  }
-  
-  /* Responsive styling for smaller screens */
-  @media (max-width: 768px) {
-    /* Hide the side navigation on smaller screens */
-    .SideNav {
-      display: none;
-    }
-  
-    /* Show a menu button when the side nav is hidden */
-    .menuButton {
-      display: block;
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      z-index: 1000; /* Ensure the button is above other content */
-    }
-  
-    /* Style for the side nav overlay */
-    .sideNavOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-      z-index: 999; /* Ensure the overlay is below the menu button */
-      transition: opacity 0.3s ease;
-    }
-  
-    /* Display overlay and side nav when toggled */
-    .sideNavOverlay.show,
-    .SideNav.show {
-      display: block;
-    }
-  
-    .SideNav.show {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 75%; /* Adjust width as needed */
-      height: 100%;
-      background-color: var(--background-light); /* Light mode background */
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add shadow for better visibility */
-      z-index: 1001; /* Ensure the nav is above the overlay */
-    }
-  
-    /* Adjust the transition for SideNav */
-    .SideNav {
-      transition: transform 0.3s ease;
-    }
-  }
-  
-  /* Styles for SideNav */
-  .SideNav {
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  
-  .SideNav a {
-    color: var(--text-light);
-  }
-  
-  .SideNav a:hover {
-    background-color: var(--primary-light);
-  }
-  
-  /* Hover effect for nav items */
-  .navList {
-    margin-bottom: 0.5rem;
-    width: 100%;
-  }
-  
-  .navList:hover {
-    margin-bottom: 0.5rem;
-    width: 100%;
-    background-color: hsla(237, 69%, 68%, 0.534);
-    border-radius: 5px;
-    border: 2px solid;
-  }
-  
-  /* Ensure consistent icon styles */
-  .navIcon {
-    font-size: 1.50rem; /* 20px */
-    line-height: 1.75rem; /* 28px */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.25rem;
-    border-radius: 9999px;
-  }
-  
+  color: blue;
+}
+
+body.dark-mode .navIcon {
+  color: blue;
+}
+
+/* Hover effect for nav items */
+.navList {
+  margin-bottom: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem; /* Consistent padding */
+  border-radius: 9999px; /* Consistent border radius */
+  border: 2px solid transparent; /* Ensure border is consistent */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.navList:hover {
+  background-color: var(--secondary-light); /* Hover background color */
+}
+
+/* Ensure consistent icon styles */
+.navIcon {
+  font-size: 1.50rem;
+  line-height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  transition: color 0.3s ease; /* Smooth transition for icon color */
+}

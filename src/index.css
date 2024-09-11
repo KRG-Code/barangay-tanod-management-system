@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Base theme colors */
 :root {
   --text-light: #0b0c18;
   --background-light: #e8e9f7;
@@ -14,19 +15,13 @@
   --primary-dark: #989ce6;
   --secondary-dark: #191f8a;
   --accent-dark: #4750eb;
+  
 
   --font-body: "Roboto", sans-serif;
   --font-headings: "Inter", sans-serif;
 }
 
-html, body, #root, .App {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-body);
-}
-
-/* Base styles for light and dark modes */
+/* Dark and light mode styles */
 body.light-mode {
   color: var(--text-light);
   background-color: var(--background-light);
@@ -41,7 +36,6 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-headings);
 }
 
-/* Icon colors */
 .icon {
   color: var(--primary-light);
 }
@@ -50,40 +44,36 @@ body.dark-mode .icon {
   color: var(--primary-dark);
 }
 
-/* SideNav styling */
-body.light-mode aside {
-  background-color: white;
-  color: #080917;
+
+.SideNav a {
+  color: var(--text-light);
+
 }
 
-body.dark-mode aside {
+body.dark-mode .SideNav a {
+  color: var(--text-dark);
+}
+
+body.light-mode .SideNav {
+background-color: white;
+transition: background-color 0.3s ease;
+transition: width 0.3s linear;
+}
+
+body.dark-mode .SideNav {
   background-color: var(--background-dark);
-  color: white;
+  transition: background-color 0.3s ease;
+  transition: width 0.3s linear;
+  }
+
+.navIcon {
+  font-size: 1.50rem;
+  line-height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  transition: color 0.3s ease; /* Smooth transition for icon color */
 }
 
-/* LGU icon specific color */
-.text-primary-light {
-  color: var(--primary-light);
-}
-
-.text-primary-dark {
-  color: var(--primary-dark);
-}
-
-/* Hover effects */
-a:hover {
-  background-color: var(--secondary-light);
-}
-
-body.dark-mode a:hover {
-  background-color: var(--secondary-light);
-}
-
-/* Icon border on hover */
-a span:hover {
-  border-color: var(--accent-light);
-}
-
-body.dark-mode a span:hover {
-  border-color: var(--accent-dark);
-}
