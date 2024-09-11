@@ -15,7 +15,6 @@
   --primary-dark: #989ce6;
   --secondary-dark: #191f8a;
   --accent-dark: #4750eb;
-  
 
   --font-body: "Roboto", sans-serif;
   --font-headings: "Inter", sans-serif;
@@ -32,7 +31,12 @@ body.dark-mode {
   background-color: black;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-headings);
 }
 
@@ -44,30 +48,29 @@ body.dark-mode .icon {
   color: var(--primary-dark);
 }
 
-
 .SideNav a {
   color: var(--text-light);
-
+  z-index: 4;
 }
 
 body.dark-mode .SideNav a {
   color: var(--text-dark);
 }
 
-body.light-mode .SideNav {
-background-color: white;
-transition: background-color 0.3s ease;
-transition: width 0.3s linear;
+body.light-mode .SideNav{
+  background-color: white;
+  transition: background-color 0.5s ease;
+
 }
 
-body.dark-mode .SideNav {
+body.dark-mode .SideNav{
   background-color: var(--background-dark);
-  transition: background-color 0.3s ease;
-  transition: width 0.3s linear;
-  }
+  transition: background-color 0.5s ease;
+}
+
 
 .navIcon {
-  font-size: 1.50rem;
+  font-size: 1.5rem;
   line-height: 1.75rem;
   display: flex;
   align-items: center;
@@ -77,3 +80,45 @@ body.dark-mode .SideNav {
   transition: color 0.3s ease; /* Smooth transition for icon color */
 }
 
+.TopNav a {
+  color: var(--text-light);
+}
+
+body.dark-mode .TopNav a {
+  color: var(--text-dark);
+}
+
+body.light-mode .TopNav {
+  background-color: white;
+  transition: background-color 0.5s ease;
+}
+
+body.dark-mode .TopNav {
+  background-color: var(--background-dark);
+  transition: background-color 0.5s ease;
+}
+
+.navList {
+  margin-bottom: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem; /* Consistent padding */
+  border-radius: 9999px; /* Consistent border radius */
+  border: 2px solid transparent; /* Ensure border is consistent */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.navList:hover {
+  background-color: var(--secondary-light); /* Hover background color */
+}
+
+/* Ensure consistent icon styles */
+.navIcon {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  transition: color 0.3s ease; /* Smooth transition for icon color */
+}

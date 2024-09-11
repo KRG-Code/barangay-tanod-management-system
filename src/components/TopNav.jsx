@@ -9,8 +9,8 @@ export default function TopNav({ toggleSideNav }) {
   ];
 
   return (
-    <aside className="rounded-2xl ml-5 SideNav">
-      <header className="bg-background text-text shadow p-4 flex justify-between items-center rounded navigation">
+    <aside className="rounded-2xl TopNav">
+      <header className="bg-background text-text p-4 flex justify-between items-center rounded navigation">
         <button onClick={toggleSideNav} className="text-2xl">
           <RiMenuLine />
         </button>
