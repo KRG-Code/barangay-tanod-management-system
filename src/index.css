@@ -44,9 +44,14 @@ h6 {
   color: var(--primary-light);
 }
 
-body.dark-mode .icon {
-  color: var(--primary-dark);
+body.light-mode .navIcon {
+  color: blue;
 }
+
+body.dark-mode .navIcon {
+  color: blue;
+}
+
 
 .SideNav a {
   color: var(--text-light);
@@ -121,4 +126,99 @@ body.dark-mode .TopNav {
   padding: 0.25rem;
   border-radius: 9999px;
   transition: color 0.3s ease; /* Smooth transition for icon color */
+}
+
+/* mapStyles.css */
+
+/* Custom zoom control styles */
+.leaflet-bar {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.leaflet-bar a {
+  display: block;
+  text-align: center;
+  padding: 5px;
+  font-size: 18px;
+  color: #333;
+  text-decoration: none;
+}
+
+.leaflet-bar a:hover {
+  background-color: #f0f0f0;
+}
+
+/* Map container styling */
+.leaflet-container {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  top: 0;
+  display: flex;
+}
+
+@media only screen and (min-width: 768spx) and (max-width: 1024px) {
+  /* Hover effect for nav items */
+
+  .navList {
+    margin-bottom: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1rem; /* Consistent padding */
+    border-radius: 9999px; /* Consistent border radius */
+    border: 2px solid transparent; /* Ensure border is consistent */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+  }
+
+  .navList:hover {
+    background-color: var(--secondary-light); /* Hover background color */
+  }
+
+  /* Ensure consistent icon styles */
+  .navIcon {
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    transition: color 0.3s ease; /* Smooth transition for icon color */
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .SideNav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 999;
+    width: 60vw; /* Adjust width as needed */
+    background-color: var(--background-light); /* Light mode background color */
+    transition: transform 0.3s ease-in-out, visibility 0.3s ease; /* Smooth transition */
+    border-top-left-radius: 0rem;
+    border-bottom-left-radius: 0rem;
+  }
+
+  .SideNav-open{
+    transform: translateX(0); /* Slide into view */
+    visibility: visible; /* Make SideNav visible */
+  }
+
+  .SideNav-close{
+    transform: translateX(-100%); /* Slide out of view */
+    visibility: hidden; /* Hide SideNav */
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 60vw; /* Align with SideNav width */
+    width: 40vw; /* Cover remaining space */
+    height: 100%;
+    z-index: 998;
+
+  }
+
 }

@@ -1,6 +1,7 @@
-import { RiRoadMapLine, RiCalendarScheduleLine, RiAlertLine, RiUserStarLine, RiToolsLine } from "react-icons/ri";
+import { RiDashboardLine, RiRoadMapLine, RiCalendarScheduleLine, RiAlertLine, RiUserStarLine, RiToolsLine } from "react-icons/ri";
 
 export const buttonData = [
+  { label: "DashBoard", icon: <RiDashboardLine /> },
   { label: "Patrol Map", icon: <RiRoadMapLine /> },
   { label: "Schedule", icon: <RiCalendarScheduleLine /> },
   { label: "Incidents", icon: <RiAlertLine /> },

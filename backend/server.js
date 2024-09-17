@@ -15,7 +15,7 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3000', // Update to match your frontend URL
+  origin: process.env.NODE_ENV === 'production' ? 'https://your-frontend-url.com' : 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type']
 }));
@@ -24,8 +24,24 @@ app.use(cors({
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
+// Global error handler (optional)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send({
+    message: 'An unexpected error occurred',
+    error: err.message,
+  });
+});
+
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  server.close(() => {
+    console.log('Process terminated');
+  });
 });

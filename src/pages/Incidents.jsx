@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import SideNav from "../components/SideNav";
-import TopNav from "../components/TopNav";
-import MainContent from "../components/MainContent";
+import SideNav from "../components/layout/SideNav";
+import TopNav from "../components/layout/TopNav";
+import Inci from "../components/auth/Incidents";
 
-export default function Homepage() {
+export default function Incidents() {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode] = useState(false); // If only isDarkMode is being used
+
 
   const toggleSideNav = () => {
     setIsSideNavOpen(!isSideNavOpen);
@@ -21,11 +22,9 @@ export default function Homepage() {
           {/* TopNav aligned to right */}
           <TopNav toggleSideNav={toggleSideNav} />
 
-          {/* Main content */}
-          <main
-            className={`main-content mt-16 ${isSideNavOpen ? "side-nav-open" : ""}`}
-          >
-            <MainContent />
+          {/* Main content with routes */}
+          <main className="main-content mt-16">
+            <Inci />
           </main>
         </div>
       </div>

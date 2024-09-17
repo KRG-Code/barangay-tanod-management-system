@@ -1,6 +1,6 @@
-import Header from "../components/Header";
-import Login from "../components/Login";
-import ThemeToggle from "../components/ThemeToggle";
+import Header from "../components/layout/Header";
+import Login from "../components/auth/Login";
+import ThemeToggle from "../components/forms/ThemeToggle";
 
 
 export default function LoginPage() {
