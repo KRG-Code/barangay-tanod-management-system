@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../forms/ThemeToggle";
 import { RiUser3Line, RiMenuLine } from "react-icons/ri";
 
 export default function TopNav({ toggleSideNav }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const [profilePicture, setProfilePicture] = useState(null); // Track profile picture
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch user data from localStorage or backend
+    const token = localStorage.getItem('token');
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+
+    if (storedUser && storedUser.profilePicture) {
+      setProfilePicture(`http://localhost:5000/uploads/${storedUser.profilePicture}`); // Load user's profile picture
+    }
+  }, []);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -16,21 +27,15 @@ export default function TopNav({ toggleSideNav }) {
   };
 
   const handleLogout = () => {
-    console.log("Logging out..."); // Debug log
-
-    // Clear authentication tokens or user data
     localStorage.removeItem('token'); 
     sessionStorage.removeItem('token');
-
-    closeDropdown(); // Close the dropdown
-
-    // Redirect to the login page
+    closeDropdown();
     navigate('/');
   };
 
   const handleMyAccount = () => {
-    closeDropdown(); // Close the dropdown
-    navigate('/MyAccount'); // Redirect to the My Account page
+    closeDropdown();
+    navigate('/MyAccount');
   };
 
   const navItems = [
@@ -56,11 +61,16 @@ export default function TopNav({ toggleSideNav }) {
 
           {/* User Icon with Dropdown */}
           <div className="relative">
-            <button
-              onClick={toggleDropdown}
-              className="text-2xl border-2 rounded-full p-1"
-            >
-              <RiUser3Line />
+            <button onClick={toggleDropdown} className="text-2xl border-2 rounded-full p-1">
+              {profilePicture ? (
+                <img
+                  src={profilePicture}
+                  alt="Profile"
+                  className="rounded-full w-8 h-8 object-cover"
+                />
+              ) : (
+                <RiUser3Line />
+              )}
             </button>
 
             {isDropdownOpen && (
@@ -68,13 +78,13 @@ export default function TopNav({ toggleSideNav }) {
                 <ul className="py-2 ml-5 mr-5 my-5">
                   <li
                     className="px-4 py-2 hover:bg-blue5 rounded-3xl"
-                    onClick={handleMyAccount} // Navigate to My Account
+                    onClick={handleMyAccount}
                   >
                     My Account
                   </li>
                   <li
                     className="px-4 py-2 hover:bg-blue5 rounded-3xl"
-                    onClick={handleLogout} // Log out and redirect to login
+                    onClick={handleLogout}
                   >
                     Log Out
                   </li>
@@ -85,12 +95,8 @@ export default function TopNav({ toggleSideNav }) {
         </div>
       </header>
 
-      {/* Clicking outside the dropdown should close it */}
       {isDropdownOpen && (
-        <div
-          className="fixed inset-0 z-10"
-          onClick={closeDropdown} // Close dropdown when clicking outside
-        ></div>
+        <div className="fixed inset-0 z-10" onClick={closeDropdown}></div>
       )}
     </aside>
   );

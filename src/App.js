@@ -1,5 +1,8 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';  // Import the AuthProvider
+import ProtectedRoute from './components/ProtectedRoute';  // Import the ProtectedRoute component
+
 const SignupPage = lazy(() => import('./pages/Signup'));
 const LoginPage = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -12,23 +15,73 @@ const MyAccount = lazy(() => import('./pages/MyAccount'));
 
 function App() {
   return (
-    <div className="flex-1 p-6 bg-background text-text">
-      <BrowserRouter>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/Dashboard" element={<Dashboard />} />
-            <Route path="/Patrolmap" element={<Patrolmap />} />
-            <Route path="/Equipments" element={<Equipments />} />
-            <Route path="/Performance" element={<Performance />} />
-            <Route path="/Schedule" element={<Schedule />} />
-            <Route path="/Incidents" element={<Incidents />} />
-            <Route path="/MyAccount" element={<MyAccount />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </div>
+    <AuthProvider>  {/* Wrap the app with AuthProvider to share authentication state */}
+      <div className="flex-1 p-6 bg-background text-text">         
+          <Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              {/* Protect these routes using ProtectedRoute */}
+              <Route 
+                path="/Dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/Patrolmap" 
+                element={
+                  <ProtectedRoute>
+                    <Patrolmap />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/Equipments" 
+                element={
+                  <ProtectedRoute>
+                    <Equipments />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/Performance" 
+                element={
+                  <ProtectedRoute>
+                    <Performance />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/Schedule" 
+                element={
+                  <ProtectedRoute>
+                    <Schedule />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/Incidents" 
+                element={
+                  <ProtectedRoute>
+                    <Incidents />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/MyAccount" 
+                element={
+                  <ProtectedRoute>
+                    <MyAccount />
+                  </ProtectedRoute>
+                } 
+              />
+            </Routes>
+          </Suspense>
+      </div>
+    </AuthProvider>
   );
 }
 

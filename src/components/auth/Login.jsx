@@ -1,3 +1,4 @@
+// src/pages/Login.js
 import { useState } from 'react';
 import { loginFields } from "../constants/formFields";
 import { useNavigate } from 'react-router-dom';
@@ -5,6 +6,7 @@ import FormAction from "../forms/FormAction";
 import FormExtra from "../forms/FormExtra";
 import Input from "../inputs/Input";
 import { validateLogin } from '../../utils/validation';
+
 
 const fieldsState = loginFields.reduce((acc, field) => {
   acc[field.id] = '';
@@ -27,7 +29,6 @@ export default function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    // Validate form using validation.js
     const { valid, errors: validationErrors } = validateLogin(loginState);
     if (!valid) {
       setErrors(validationErrors);
@@ -42,11 +43,15 @@ export default function Login() {
         body: JSON.stringify(loginState),
       });
       const data = await response.json();
+
       if (response.ok) {
-        setSuccessMessage('Logged in successfully!');
+        // Save the token to localStorage
         localStorage.setItem('token', data.token);
-        navigate('/Dashboard');
+        setSuccessMessage('Logged in successfully!');
         setErrorMessage('');
+
+        // Navigate to the dashboard or protected route
+        navigate('/Dashboard');
       } else {
         setErrorMessage(data.message || 'Invalid login credentials');
         setSuccessMessage('');
@@ -77,6 +82,7 @@ export default function Login() {
       {successMessage && <p className="text-green-500">{successMessage}</p>}
       <FormExtra />
       <FormAction handleSubmit={handleSubmit} text="Login" />
+
     </form>
   );
 }
