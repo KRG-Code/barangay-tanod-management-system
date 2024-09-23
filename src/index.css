@@ -20,6 +20,11 @@
   --font-headings: "Inter", sans-serif;
 }
 
+body{
+  margin: 0;
+  padding: 0;
+}
+
 /* Dark and light mode styles */
 body.light-mode {
   color: var(--text-light);
