@@ -6,7 +6,8 @@ import FormAction from "../forms/FormAction";
 import FormExtra from "../forms/FormExtra";
 import Input from "../inputs/Input";
 import { validateLogin } from '../../utils/validation';
-
+import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
 const fieldsState = loginFields.reduce((acc, field) => {
   acc[field.id] = '';
@@ -15,8 +16,6 @@ const fieldsState = loginFields.reduce((acc, field) => {
 
 export default function Login() {
   const [loginState, setLoginState] = useState(fieldsState);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -47,42 +46,40 @@ export default function Login() {
       if (response.ok) {
         // Save the token to localStorage
         localStorage.setItem('token', data.token);
-        setSuccessMessage('Logged in successfully!');
-        setErrorMessage('');
+        toast.success('Logged in successfully!'); // Use Toastify for success
 
         // Navigate to the dashboard or protected route
         navigate('/Dashboard');
       } else {
-        setErrorMessage(data.message || 'Invalid login credentials');
-        setSuccessMessage('');
+        toast.error(data.message || 'Invalid login credentials'); // Use Toastify for error
       }
     } catch {
-      setErrorMessage('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.'); // Use Toastify for errors
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-      <div className="-space-y-px text-black">
-        {loginFields.map(field => (
-          <div key={field.id}>
-            <Input
-              handleChange={handleChange}
-              value={loginState[field.id]}
-              {...field}
-            />
-            {errors[field.id] && <p className="text-red-500">{errors[field.id]}</p>}
-          </div>
-        ))}
-      </div>
-      {loading && <p>Loading...</p>}
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-      {successMessage && <p className="text-green-500">{successMessage}</p>}
-      <FormExtra />
-      <FormAction handleSubmit={handleSubmit} text="Login" />
-
-    </form>
+    <>
+      <ToastContainer /> {/* Include the ToastContainer */}
+      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <div className="-space-y-px text-black">
+          {loginFields.map(field => (
+            <div key={field.id}>
+              <Input
+                handleChange={handleChange}
+                value={loginState[field.id]}
+                {...field}
+              />
+              {errors[field.id] && <p className="text-red-500">{errors[field.id]}</p>}
+            </div>
+          ))}
+        </div>
+        {loading && <p>Loading...</p>}
+        <FormExtra />
+        <FormAction handleSubmit={handleSubmit} text="Login" />
+      </form>
+    </>
   );
 }

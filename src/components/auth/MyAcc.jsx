@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
+import { compressImage } from '../../utils/ImageCompression';
+import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
 export default function MyAcc() {
   const navigate = useNavigate();
@@ -21,8 +24,6 @@ export default function MyAcc() {
     newPassword: "",
     confirmNewPassword: "",
   });
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const calculateAge = (birthday) => {
@@ -30,11 +31,7 @@ export default function MyAcc() {
     const birthDate = new Date(birthday);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
     return age;
@@ -58,8 +55,7 @@ export default function MyAcc() {
 
         const data = await response.json();
         if (response.ok) {
-          setAccountState((prevState) => ({
-            ...prevState,
+          setAccountState({
             firstName: data.firstName,
             lastName: data.lastName,
             address: data.address,
@@ -69,14 +65,13 @@ export default function MyAcc() {
               : "",
             gender: data.gender || "",
             profilePicture: data.profilePicture || null,
-          }));
+          });
           setAge(calculateAge(data.birthday));
         } else {
-          setErrorMessage(data.message || "Failed to load user data");
+          toast.error(data.message || "Failed to load user data");
         }
       } catch (error) {
-        console.error(error);
-        setErrorMessage("An error occurred. Please try again.");
+        toast.error("An error occurred while fetching user data.");
       }
     };
 
@@ -86,20 +81,21 @@ export default function MyAcc() {
   const handleChange = (e) => {
     const { id, value } = e.target;
     setAccountState((prevState) => ({ ...prevState, [id]: value }));
-
-    if (id === "gender") {
-      setAccountState((prevState) => ({ ...prevState, gender: value }));
-    }
   };
 
-  const handleProfilePictureChange = (e) => {
+  const handleProfilePictureChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAccountState({ ...accountState, profilePicture: reader.result });
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedFile = await compressImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setAccountState((prevState) => ({ ...prevState, profilePicture: reader.result }));
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        toast.error("Image compression failed. Please try again with a smaller image.");
+      }
     }
   };
 
@@ -120,14 +116,17 @@ export default function MyAcc() {
 
       const data = await response.json();
       if (response.ok) {
-        setSuccessMessage("Profile updated successfully!");
+        toast.success("Profile updated successfully!");
         setIsEditing(false);
-        setErrorMessage("");
+      } else if (response.status === 400) {
+        toast.error("Validation error. Please check the data and try again.");
+      } else if (response.status === 413) {
+        toast.error("Image too large. Please try with a smaller image.");
       } else {
-        setErrorMessage(data.message || "Failed to update profile");
+        toast.error(data.message || "Failed to update profile.");
       }
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again.");
+      toast.error("An error occurred while updating the profile.");
     } finally {
       setLoading(false);
     }
@@ -136,7 +135,7 @@ export default function MyAcc() {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (passwords.newPassword !== passwords.confirmNewPassword) {
-      setErrorMessage("New passwords do not match.");
+      toast.error("New passwords do not match.");
       return;
     }
     try {
@@ -155,19 +154,21 @@ export default function MyAcc() {
 
       const data = await response.json();
       if (response.ok) {
-        setSuccessMessage("Password changed successfully!");
-        setErrorMessage("");
+        toast.success("Password changed successfully!");
         setIsChangingPassword(false);
+      } else if (response.status === 401) {
+        toast.error("Current password is incorrect.");
       } else {
-        setErrorMessage(data.message || "Failed to change password");
+        toast.error(data.message || "Failed to change password.");
       }
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again.");
+      toast.error("An error occurred while changing the password.");
     }
   };
 
   return (
     <div className="container mx-auto mt-8 space-y-6 ">
+      <ToastContainer /> {/* Include the ToastContainer */}
       <div className="flex">
         <div className="w-1/3">
           <div className="relative">
@@ -294,7 +295,7 @@ export default function MyAcc() {
                   id="birthday"
                   value={accountState.birthday}
                   onChange={handleChange}
-                  className="border px-2 py-1 text-black" 
+                  className="border px-2 py-1 text-black"
                 />
               ) : (
                 <span>{accountState.birthday}</span>
@@ -302,10 +303,6 @@ export default function MyAcc() {
             </div>
 
             {loading && <p>Loading...</p>}
-            {successMessage && (
-              <p className="text-green-500">{successMessage}</p>
-            )}
-            {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
             {isEditing && (
               <>
@@ -378,11 +375,6 @@ export default function MyAcc() {
                   className="border px-2 py-1"
                 />
               </div>
-
-              {errorMessage && <p className="text-red-500">{errorMessage}</p>}
-              {successMessage && (
-                <p className="text-green-500">{successMessage}</p>
-              )}
 
               <button
                 type="submit"

@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout'; // New Layout component for persistent Navbar and Sidebar
 import { CombinedProvider } from './contexts/useContext';
+import { ToastContainer } from 'react-toastify'; // Import ToastContainer
 
 const SignupPage = lazy(() => import('./pages/Signup'));
 const LoginPage = lazy(() => import('./pages/Login'));
@@ -17,25 +18,26 @@ function App() {
   return (
     <div className="flex-1 p-6 bg-background text-text">
       <BrowserRouter>
-      <CombinedProvider>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+        <CombinedProvider>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ToastContainer /> {/* Moved here for global access */}
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
 
-            {/* Layout Route for Private Pages with Sidebar and Navbar */}
-            <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/patrolmap" element={<Patrolmap />} />
-              <Route path="/equipments" element={<Equipments />} />
-              <Route path="/performance" element={<Performance />} />
-              <Route path="/schedule" element={<Schedule />} />
-              <Route path="/incidents" element={<Incidents />} />
-              <Route path="/myaccount" element={<MyAccount />} />
-            </Route>
-          </Routes>
-        </Suspense>
+              {/* Layout Route for Private Pages with Sidebar and Navbar */}
+              <Route element={<Layout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/patrolmap" element={<Patrolmap />} />
+                <Route path="/equipments" element={<Equipments />} />
+                <Route path="/performance" element={<Performance />} />
+                <Route path="/schedule" element={<Schedule />} />
+                <Route path="/incidents" element={<Incidents />} />
+                <Route path="/myaccount" element={<MyAccount />} />
+              </Route>
+            </Routes>
+          </Suspense>
         </CombinedProvider>
       </BrowserRouter>
     </div>
