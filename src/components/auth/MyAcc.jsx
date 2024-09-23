@@ -222,7 +222,7 @@ export default function MyAcc() {
           {!isEditing && !isChangingPassword && (
             <button
               onClick={() => setIsEditing(true)}
-              className="mt-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              className="mt-6 mr-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
             >
               Edit Profile
             </button>
@@ -315,7 +315,7 @@ export default function MyAcc() {
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="mt-6 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                  className="mt-6 ml-6 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
                 >
                   Cancel
                 </button>
@@ -339,7 +339,7 @@ export default function MyAcc() {
                       currentPassword: e.target.value,
                     })
                   }
-                  className="border px-2 py-1"
+                  className="border px-2 py-1 text-black"
                 />
               </div>
 
@@ -354,7 +354,7 @@ export default function MyAcc() {
                   onChange={(e) =>
                     setPasswords({ ...passwords, newPassword: e.target.value })
                   }
-                  className="border px-2 py-1"
+                  className="border px-2 py-1 text-black"
                 />
               </div>
 
@@ -372,7 +372,7 @@ export default function MyAcc() {
                       confirmNewPassword: e.target.value,
                     })
                   }
-                  className="border px-2 py-1"
+                  className="border px-2 py-1 text-black"
                 />
               </div>
 
@@ -385,7 +385,7 @@ export default function MyAcc() {
               <button
                 type="button"
                 onClick={() => setIsChangingPassword(false)}
-                className="mt-6 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                className="mt-6 ml-6 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
               >
                 Cancel
               </button>

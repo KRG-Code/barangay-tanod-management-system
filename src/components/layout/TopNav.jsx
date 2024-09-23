@@ -12,8 +12,15 @@ export default function TopNav() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser && storedUser.profilePicture) {
-      setProfilePicture(`http://localhost:5000/uploads/${storedUser.profilePicture}`);
+    if (storedUser) {
+      fetch(`http://localhost:5000/api/users/${storedUser.id}`) // Adjust API endpoint as needed
+        .then(response => response.json())
+        .then(data => {
+          if (data.profilePicture) {
+            setProfilePicture(data.profilePicture); // Assuming the URL is directly in the response
+          }
+        })
+        .catch(error => console.error('Error fetching user data:', error));
     }
   }, []);
 
@@ -22,13 +29,14 @@ export default function TopNav() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user'); // Clear user info on logout
     closeDropdown();
     navigate('/');
   };
 
   const handleMyAccount = () => {
     closeDropdown();
-    navigate('/MyAccount');
+    navigate('/myaccount');
   };
 
   const navItems = [{ id: 1, component: <ThemeToggle />, label: "Theme Toggle" }];

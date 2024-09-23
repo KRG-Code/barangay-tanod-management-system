@@ -1,7 +1,10 @@
+// authController.js
 const User = require('../models/User');
+const Equipment = require("../models/Equipment");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
+const { bucket } = require('../config/firebaseAdmin');
 
 // Generate JWT token
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -45,7 +48,7 @@ exports.updateUserProfile = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     Object.assign(user, req.body);
-    if (req.file) user.profilePicture = req.file.filename; // Assuming multer is configured for file upload
+    if (req.file) user.profilePicture = req.file.filename;
 
     await user.save();
     res.json(user);
@@ -78,9 +81,59 @@ exports.changePassword = async (req, res) => {
 
     if (!(await bcrypt.compare(currentPassword, user.password))) return res.status(400).json({ message: 'Current password is incorrect' });
 
-    user.password = newPassword;
+    user.password = await bcrypt.hash(newPassword, 10); // Hash new password
     await user.save();
     res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Function to add equipment
+exports.addEquipment = async (req, res) => {
+  const { name, borrowDate, returnDate, imageUrl } = req.body;
+
+  try {
+    const newEquipment = new Equipment({
+      name,
+      borrowDate,
+      returnDate,
+      imageUrl,
+      user: req.user.id, // Assuming user is authenticated
+    });
+
+    const savedEquipment = await newEquipment.save();
+    res.status(201).json(savedEquipment);
+  } catch (error) {
+    console.error("Error saving equipment:", error);
+    res.status(500).json({ message: 'Error saving equipment' });
+  }
+};
+
+// Function to get all equipment
+exports.getEquipments = async (req, res) => {
+  try {
+    const equipments = await Equipment.find().populate('user', 'firstName lastName');
+    res.status(200).json(equipments);
+  } catch (error) {
+    console.error("Error fetching equipments:", error);
+    res.status(500).json({ message: 'Error fetching equipments' });
+  }
+};
+
+// Update equipment by ID
+exports.updateEquipment = async (req, res) => {
+  try {
+    const equipment = await Equipment.findById(req.params.id);
+    
+    if (!equipment) {
+      return res.status(404).json({ message: 'Equipment not found' });
+    }
+    
+    equipment.returnDate = req.body.returnDate; // Update return date
+    const updatedEquipment = await equipment.save();
+    
+    res.json(updatedEquipment);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -1,10 +1,18 @@
+// authRoutes.js
 const express = require('express');
 const { body } = require('express-validator');
-const { registerUser, loginUser, getUserProfile, updateUserProfile, changePassword } = require('../controllers/authController');
+const {
+  registerUser,
+  loginUser,
+  getUserProfile,
+  updateUserProfile,
+  changePassword
+} = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
+// User registration route
 router.post('/register', [
   body('firstName').notEmpty().withMessage('First Name is required'),
   body('lastName').notEmpty().withMessage('Last Name is required'),
@@ -12,9 +20,16 @@ router.post('/register', [
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ], registerUser);
 
+// User login route
 router.post('/login', loginUser);
+
+// Get current user profile
 router.get('/me', protect, getUserProfile);
+
+// Update user profile
 router.put('/update', protect, updateUserProfile);
+
+// Change user password
 router.put('/change-password', protect, changePassword);
 
 module.exports = router;
