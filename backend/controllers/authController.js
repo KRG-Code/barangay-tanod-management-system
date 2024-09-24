@@ -113,7 +113,7 @@ exports.addEquipment = async (req, res) => {
 // Function to get all equipment
 exports.getEquipments = async (req, res) => {
   try {
-    const equipments = await Equipment.find().populate('user', 'firstName lastName');
+    const equipments = await Equipment.find({ user: req.user._id }).populate('user', 'firstName lastName');
     res.status(200).json(equipments);
   } catch (error) {
     console.error("Error fetching equipments:", error);
