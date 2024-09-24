@@ -4,6 +4,8 @@ import { FaEdit } from "react-icons/fa";
 import { compressImage } from '../../utils/ImageCompression';
 import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase imports
+import { storage } from "../../firebase"; // Firebase storage instance
 
 export default function MyAcc() {
   const navigate = useNavigate();
@@ -83,18 +85,23 @@ export default function MyAcc() {
     setAccountState((prevState) => ({ ...prevState, [id]: value }));
   };
 
+  // Handle profile picture upload to Firebase
   const handleProfilePictureChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       try {
-        const compressedFile = await compressImage(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setAccountState((prevState) => ({ ...prevState, profilePicture: reader.result }));
-        };
-        reader.readAsDataURL(compressedFile);
+        const compressedFile = await compressImage(file); // Optional: Compress the image
+        const storageRef = ref(storage, `userprofiles/${file.name}`); // Create folder for user profiles
+
+        // Upload file to Firebase storage
+        const snapshot = await uploadBytes(storageRef, compressedFile);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        // Set the profile picture URL to the Firebase URL
+        setAccountState((prevState) => ({ ...prevState, profilePicture: downloadURL }));
+        toast.success("Profile picture uploaded successfully!");
       } catch (error) {
-        toast.error("Image compression failed. Please try again with a smaller image.");
+        toast.error("Error uploading profile picture. Please try again.");
       }
     }
   };
