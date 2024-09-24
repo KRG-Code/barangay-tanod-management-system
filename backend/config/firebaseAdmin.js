@@ -1,6 +1,10 @@
-// firebaseAdmin.js
 const admin = require('firebase-admin');
-const serviceAccount = require('./barangay-tanod-ms-firebase-adminsdk-b6j9o-359a5ccdb0.json'); // Adjust the path
+
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+};
 
 // Initialize Firebase only if it hasn't been initialized yet
 if (!admin.apps.length) {

@@ -10,10 +10,15 @@ const app = express();
 connectDB();
 
 // Firebase Admin Setup
-const serviceAccount = require('./config/barangay-tanod-ms-firebase-adminsdk-b6j9o-359a5ccdb0.json'); // Path to your service account key
+const serviceAccount = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Handle newlines
+};
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET, // Set this in your .env
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 const bucket = admin.storage().bucket();
