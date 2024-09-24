@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   gender: { type: String, enum: ['Male', 'Female', 'Others', 'None'], default: 'None' },
   profilePicture: { type: String },
+  userType: { type: String, enum: ['resident', 'tanod'], required: true },
 });
 
 // Hash password before saving the user

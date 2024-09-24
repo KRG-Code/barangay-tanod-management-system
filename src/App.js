@@ -1,18 +1,26 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Layout from './components/layout/Layout'; // New Layout component for persistent Navbar and Sidebar
-import { CombinedProvider } from './contexts/useContext';
-import { ToastContainer } from 'react-toastify'; // Import ToastContainer
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/layout/Layout"; 
+import { CombinedProvider } from "./contexts/useContext";
+import { ToastContainer } from "react-toastify"; 
+import ProtectedRoute from "./utils/ProtectedRoute"; // Import the ProtectedRoute
 
-const SignupPage = lazy(() => import('./pages/Signup'));
-const LoginPage = lazy(() => import('./pages/Login'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Patrolmap = lazy(() => import('./pages/Patrolmap'));
-const Equipments = lazy(() => import('./pages/Equipments'));
-const Performance = lazy(() => import('./pages/Performance'));
-const Schedule = lazy(() => import('./pages/Schedule'));
-const Incidents = lazy(() => import('./pages/Incidents'));
-const MyAccount = lazy(() => import('./pages/MyAccount'));
+const SelectionPage = lazy(() => import("./pages/SelectionPage"));
+const SignupPage = lazy(() => import("./pages/Signup"));
+const LoginTanod = lazy(() => import("./pages/LoginTanod"));
+const LoginResident = lazy(() => import("./pages/ResidentLogin"));
+
+// Tanod routes
+const Dashboard = lazy(() => import("./components/users/tanods/Dashboard"));
+const Patrolmap = lazy(() => import("./components/users/tanods/Map"));
+const Equipments = lazy(() => import("./components/users/tanods/Equipment"));
+const Performance = lazy(() => import("./components/users/tanods/Performance"));
+const Schedule = lazy(() => import("./components/users/tanods/Schedule"));
+const Incidents = lazy(() => import("./components/users/tanods/Incidents"));
+const MyAccount = lazy(() => import("./components/users/tanods/MyAcc"));
+
+// Resident routes (example for future)
+const ResidentDashboard = lazy(() => import("./components/users/residents/Dashboard"));
 
 function App() {
   return (
@@ -20,22 +28,83 @@ function App() {
       <BrowserRouter>
         <CombinedProvider>
           <Suspense fallback={<div>Loading...</div>}>
-            <ToastContainer /> {/* Moved here for global access */}
+            <ToastContainer />
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<LoginPage />} />
+              <Route path="/" element={<SelectionPage />} />
+              <Route path="/tanod-login" element={<LoginTanod />} />
+              <Route path="/resident-login" element={<LoginResident />} />
               <Route path="/signup" element={<SignupPage />} />
 
-              {/* Layout Route for Private Pages with Sidebar and Navbar */}
+              {/* Protected Routes for Tanod */}
               <Route element={<Layout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/patrolmap" element={<Patrolmap />} />
-                <Route path="/equipments" element={<Equipments />} />
-                <Route path="/performance" element={<Performance />} />
-                <Route path="/schedule" element={<Schedule />} />
-                <Route path="/incidents" element={<Incidents />} />
-                <Route path="/myaccount" element={<MyAccount />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute userTypeAllowed={["tanod"]}>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/patrolmap"
+                  element={
+                    <ProtectedRoute userTypeAllowed={["tanod"]}>
+                      <Patrolmap />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/equipments"
+                  element={
+                    <ProtectedRoute userTypeAllowed={["tanod"]}>
+                      <Equipments />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/performance"
+                  element={
+                    <ProtectedRoute userTypeAllowed={["tanod"]}>
+                      <Performance />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/schedule"
+                  element={
+                    <ProtectedRoute userTypeAllowed={["tanod"]}>
+                      <Schedule />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/incidents"
+                  element={
+                    <ProtectedRoute userTypeAllowed={["tanod"]}>
+                      <Incidents />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/myaccount"
+                  element={
+                    <ProtectedRoute userTypeAllowed={["tanod"]}>
+                      <MyAccount />
+                    </ProtectedRoute>
+                  }
+                />
               </Route>
+
+              {/* Future Protected Routes for Residents */}
+              <Route
+                path="/resident-dashboard"
+                element={
+                  <ProtectedRoute userTypeAllowed={["resident"]}>
+                    <ResidentDashboard />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </Suspense>
         </CombinedProvider>

@@ -3,7 +3,8 @@ const express = require('express');
 const { body } = require('express-validator');
 const {
   registerUser,
-  loginUser,
+  loginResident,
+  loginTanod,
   getUserProfile,
   updateUserProfile,
   changePassword
@@ -21,7 +22,12 @@ router.post('/register', [
 ], registerUser);
 
 // User login route
-router.post('/login', loginUser);
+// authRoutes.js
+// User login routes
+router.post('/login/resident', loginResident); // For residents
+
+router.post('/login/tanod', loginTanod);       // For Tanods
+
 
 // Get current user profile
 router.get('/me', protect, getUserProfile);

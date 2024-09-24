@@ -1,5 +1,5 @@
-import Header from "../components/layout/Header";
-import Login from "../components/auth/Login";
+import Header from "../components/layout//ResidentHeader";
+import Login from "../components/users/residents/Login";
 import ThemeToggle from "../components/forms/ThemeToggle";
 
 
@@ -11,9 +11,9 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <Header
           heading="Login to your account"
-          paragraph="Don't have an account yet? "
-          linkName="Signup"
-          linkUrl="/signup"
+          paragraph="Don't have account yet?"
+          linkName="Sign Up"
+          linkUrl="/Signup"
         />
         <Login />
       </div>

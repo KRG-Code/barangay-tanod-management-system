@@ -14,12 +14,12 @@ exports.registerUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-  const { firstName, lastName, username, email, password, ...rest } = req.body;
+  const { firstName, lastName, username, email, password, userType, ...rest } = req.body;
 
   try {
     if (await User.findOne({ email })) return res.status(400).json({ message: 'User already exists' });
 
-    const user = await User.create({ firstName, lastName, username, email, password, ...rest });
+    const user = await User.create({ firstName, lastName, username, email, password, userType, ...rest });
     res.status(201).json({ _id: user._id, firstName: user.firstName, lastName: user.lastName, username: user.username, email: user.email, token: generateToken(user._id) });
   } catch (error) {
     console.error('Registration Error:', error.message);
@@ -58,14 +58,59 @@ exports.updateUserProfile = async (req, res) => {
 };
 
 // Login an existing user
-exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
+exports.loginResident = async (req, res) => {
+  const { email, password } = req.body; // Extract email and password from request body
   try {
+    // Find user by email
     const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
-      return res.json({ _id: user._id, firstName: user.firstName, lastName: user.lastName, username: user.username, email: user.email, token: generateToken(user._id), profilePicture: user.profilePicture });
+      // Check if user is a resident
+      if (user.userType !== 'resident') {
+        return res.status(401).json({ message: 'Unauthorized:You are not registered as a resident' });
+      }
+
+      // Login successful, send back user data and token
+      return res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        token: generateToken(user._id),
+        profilePicture: user.profilePicture
+      });
     }
+    // If email or password is incorrect
     res.status(401).json({ message: 'Invalid email or password' });
+  } catch (error) {
+    console.error('Login Error:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.loginTanod = async (req, res) => {
+  const { username, password } = req.body; // Extract username and password from request body
+  try {
+    const user = await User.findOne({ username }); // Find user by username
+    console.log(user); // Add this line to see what user object is returned
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // Check if user is a tanod
+      if (user.userType !== 'tanod') {
+        return res.status(401).json({ message: 'Unauthorized: Not a Tanod' });
+      }
+
+      return res.json({
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        token: generateToken(user._id),
+        profilePicture: user.profilePicture
+      });
+    }
+    res.status(401).json({ message: 'Invalid username or password' });
   } catch (error) {
     console.error('Login Error:', error.message);
     res.status(500).json({ message: 'Server error', error: error.message });

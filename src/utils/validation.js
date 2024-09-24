@@ -65,14 +65,13 @@ export const validateSignup = (signupState) => {
   return { valid, errors };
 };
 
-export const validateLogin = (loginState) => {
+export const validateLoginTanod = (loginState) => {
   let valid = true;
   const errors = {};
 
-  // Email validation
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!loginState.email || !emailPattern.test(loginState.email)) {
-    errors.email = "Please enter a valid email address.";
+  // Username validation
+  if (!loginState.username) {
+    errors.username = "Username is required.";
     valid = false;
   }
 
@@ -84,3 +83,23 @@ export const validateLogin = (loginState) => {
 
   return { valid, errors };
 };
+
+export const validateLoginResident = (loginState) => {
+  let valid = true;
+  const errors = {};
+
+  // Username validation
+  if (!loginState.email) {
+    errors.email = "Email is required.";
+    valid = false;
+  }
+
+  // Password validation
+  if (!loginState.password) {
+    errors.password = "Password is required.";
+    valid = false;
+  }
+
+  return { valid, errors };
+};
+

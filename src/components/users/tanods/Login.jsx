@@ -1,15 +1,15 @@
 // src/pages/Login.js
 import { useState } from 'react';
-import { loginFields } from "../constants/formFields";
+import { loginFieldsTanod } from "../../constants/formFields";
 import { useNavigate } from 'react-router-dom';
-import FormAction from "../forms/FormAction";
-import FormExtra from "../forms/FormExtra";
-import Input from "../inputs/Input";
-import { validateLogin } from '../../utils/validation';
+import FormAction from "../../forms/FormAction";
+import FormExtra from "../../forms/FormExtra";
+import Input from "../../inputs/Input";
+import { validateLoginTanod } from '../../../utils/validation';
 import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
-const fieldsState = loginFields.reduce((acc, field) => {
+const fieldsState = loginFieldsTanod.reduce((acc, field) => {
   acc[field.id] = '';
   return acc;
 }, {});
@@ -28,7 +28,7 @@ export default function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    const { valid, errors: validationErrors } = validateLogin(loginState);
+    const { valid, errors: validationErrors } = validateLoginTanod(loginState);
     if (!valid) {
       setErrors(validationErrors);
       return;
@@ -36,7 +36,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login/tanod', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginState),
@@ -65,7 +65,7 @@ export default function Login() {
       <ToastContainer /> {/* Include the ToastContainer */}
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         <div className="-space-y-px text-black">
-          {loginFields.map(field => (
+          {loginFieldsTanod.map(field => (
             <div key={field.id}>
               <Input
                 handleChange={handleChange}

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
-import { compressImage } from '../../utils/ImageCompression';
+import { compressImage } from '../../../utils/ImageCompression';
 import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase imports
-import { storage } from "../../firebase"; // Firebase storage instance
+import { storage } from "../../../firebase"; // Firebase storage instance
 
 export default function MyAcc() {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export default function MyAcc() {
     gender: "",
     profilePicture: null,
   });
+  const [localProfilePicture, setLocalProfilePicture] = useState(null);
   const [age, setAge] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -90,27 +91,46 @@ export default function MyAcc() {
     const file = e.target.files[0];
     if (file) {
       try {
-        const compressedFile = await compressImage(file); // Optional: Compress the image
-        const storageRef = ref(storage, `userprofiles/${file.name}`); // Create folder for user profiles
-
-        // Upload file to Firebase storage
-        const snapshot = await uploadBytes(storageRef, compressedFile);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-
-        // Set the profile picture URL to the Firebase URL
-        setAccountState((prevState) => ({ ...prevState, profilePicture: downloadURL }));
-        toast.success("Profile picture uploaded successfully!");
+        // Compress the image file
+        const compressedFile = await compressImage(file); // Make sure compressImage returns a Blob or File
+  
+        // Create a URL for the compressed image to display
+        const imageUrl = URL.createObjectURL(compressedFile);
+        setLocalProfilePicture(imageUrl); // Set the temporary URL for preview
+        setAccountState((prevState) => ({ ...prevState, profilePicture: compressedFile })); // Store the compressed file for upload
+        toast.success("Profile picture selected!");
       } catch (error) {
-        toast.error("Error uploading profile picture. Please try again.");
+        toast.error("Error processing profile picture. Please try again.");
       }
     }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const token = localStorage.getItem("token");
-
+  
+    // If there's a local profile picture, upload it to Firebase
+    let updatedProfilePictureURL = accountState.profilePicture; // This will be a compressed file object
+    if (updatedProfilePictureURL) {
+      try {
+        const storageRef = ref(storage, `userprofiles/${updatedProfilePictureURL.name}`); // Folder for user profiles
+        const snapshot = await uploadBytes(storageRef, updatedProfilePictureURL);
+        updatedProfilePictureURL = await getDownloadURL(snapshot.ref); // Get the Firebase URL
+      } catch (error) {
+        toast.error("Error uploading profile picture. Please try again.");
+        setLoading(false);
+        return; // Stop further execution if profile picture upload fails
+      }
+    }
+  
+    // Update the account state with the new profile picture URL (if it was changed)
+    const updatedAccountState = { 
+      ...accountState, 
+      profilePicture: updatedProfilePictureURL 
+    };
+  
     try {
       const response = await fetch("http://localhost:5000/api/auth/update", {
         method: "PUT",
@@ -118,17 +138,14 @@ export default function MyAcc() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(accountState),
+        body: JSON.stringify(updatedAccountState),
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         toast.success("Profile updated successfully!");
         setIsEditing(false);
-      } else if (response.status === 400) {
-        toast.error("Validation error. Please check the data and try again.");
-      } else if (response.status === 413) {
-        toast.error("Image too large. Please try with a smaller image.");
+        setLocalProfilePicture(null); // Clear local state after saving changes
       } else {
         toast.error(data.message || "Failed to update profile.");
       }
@@ -138,6 +155,7 @@ export default function MyAcc() {
       setLoading(false);
     }
   };
+  
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -176,11 +194,11 @@ export default function MyAcc() {
   return (
     <div className="container mx-auto mt-8 space-y-6 ">
       <ToastContainer /> {/* Include the ToastContainer */}
-      <div className="flex">
+      <div className="flex ml-3">
         <div className="w-1/3">
           <div className="relative">
             <img
-              src={accountState.profilePicture || "/default-user-icon.png"}
+              src={localProfilePicture || accountState.profilePicture || "/default-user-icon.png"}
               alt="Profile"
               className="rounded-full w-32 h-32 object-cover border-2 border-gray-200"
             />
@@ -201,7 +219,7 @@ export default function MyAcc() {
             )}
           </div>
 
-          <div className="mt-4">
+          <div className="mt-6">
             <span className="text-lg font-semibold">Age: </span>
             <span>{age || "N/A"}</span>
           </div>
@@ -215,11 +233,10 @@ export default function MyAcc() {
                 onChange={handleChange}
                 className="border px-2 py-1 text-black"
               >
-                <option value="">Not Specified</option>
+                <option value="None">❌ None</option>
                 <option value="Male">♂ Male</option>
                 <option value="Female">♀ Female</option>
-                <option value="Others">⚧ Others</option>
-                <option value="None">❌ None</option>
+                <option value="Others">⚧ Others</option>  
               </select>
             ) : (
               <span>{accountState.gender || "Not Specified"}</span>
@@ -245,7 +262,7 @@ export default function MyAcc() {
           )}
         </div>
 
-        <div className="w-2/3">
+        <div className="w-2/3 ml-5">
           <h1 className="text-3xl font-bold">My Profile</h1>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

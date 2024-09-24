@@ -1,4 +1,4 @@
-const loginFields = [
+const loginFieldsResident = [
   {
     labelText: "Email address",
     labelFor: "email",
@@ -8,6 +8,30 @@ const loginFields = [
     autoComplete: "email",
     isRequired: true,
     placeholder: "Email address"
+  },
+  {
+    labelText: "Password",
+    labelFor: "password",
+    id: "password",
+    name: "password",
+    type: "password",
+    autoComplete: "current-password",
+    isRequired: true,
+    placeholder: "Password"
+  }
+];
+
+// Ensure loginFieldsTanod remains as is
+const loginFieldsTanod = [
+  {
+    labelText: "Username",
+    labelFor: "username",
+    id: "username",
+    name: "username",
+    type: "text",
+    autoComplete: "username",
+    isRequired: true,
+    placeholder: "Username"
   },
   {
     labelText: "Password",
@@ -124,4 +148,4 @@ const signupFields = [
   }
 ];
 
-export { loginFields, signupFields };
+export { loginFieldsTanod, loginFieldsResident, signupFields };

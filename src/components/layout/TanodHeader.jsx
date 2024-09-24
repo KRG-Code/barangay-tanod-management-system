@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-
+import { GiPoliceOfficerHead } from "react-icons/gi";
 export default function Header({
   heading,
   paragraph,
@@ -9,11 +9,7 @@ export default function Header({
   return (
     <div className="mb-10">
       <div className="flex justify-center">
-        <img
-          alt="App Icon"
-          className="h-16 w-16"
-          src="./icon.svg"
-        />
+      <GiPoliceOfficerHead className="text-8xl mb-2" /> 
       </div>
       <h2 className="mt-6 text-center text-3xl font-extrabold text-text">
         {heading}

@@ -1,5 +1,5 @@
-import Header from "../components/layout/Header";
-import Signup from "../components/auth/Signup";
+import Header from "../components/layout/ResidentHeader";
+import Signup from "../components/users/residents/Signup";
 import ThemeToggle from "../components/forms/ThemeToggle";
 
 export default function SignupPage() {
@@ -12,7 +12,7 @@ export default function SignupPage() {
           heading="Signup to create an account"
           paragraph="Already have an account? "
           linkName="Login"
-          linkUrl="/"
+          linkUrl="/resident-login"
         />
         <Signup />
       </div>

@@ -23,7 +23,7 @@ export default function Layout() {
           <TopNav toggleSideNav={toggleSideNav} />
 
           {/* Main content with routes */}
-          <main className="main-content mt-16 z-0">
+          <main className="main-content mt-9 z-0">
             <Outlet />
           </main>
         </div>

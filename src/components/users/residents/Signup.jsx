@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { signupFields } from "../constants/formFields";
-import FormAction from "../forms/FormAction";
-import Input from "../inputs/Input";
-import { validateSignup } from '../../utils/validation';
-import { getPasswordStrength } from '../../utils/passwordStrength';
+import { signupFields } from "../../constants/formFields";
+import FormAction from "../../forms/FormAction";
+import Input from "../../inputs/Input";
+import { validateSignup } from '../../../utils/validation';
+import { getPasswordStrength } from '../../../utils/passwordStrength';
 
 const fieldsState = signupFields.reduce((acc, field) => {
   acc[field.id] = '';
@@ -55,14 +55,15 @@ export default function Signup() {
       setErrors(validationErrors);
       return;
     }
-
+  
     // Set gender to null if it's "Not Specified"
     const submissionData = {
       ...signupState,
       age,
       gender: signupState.gender === 'Not Specified' ? null : signupState.gender,
+      userType: 'resident', // Set userType to 'resident'
     };
-
+  
     setLoading(true);
     try {
       const response = await fetch('http://localhost:5000/api/auth/register', {
@@ -83,6 +84,7 @@ export default function Signup() {
       setLoading(false);
     }
   };
+  
 
   return (
     <>

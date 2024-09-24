@@ -8,3 +8,9 @@ export const buttonData = [
   { label: "Performance", icon: <RiUserStarLine /> },
   { label: "Equipments", icon: <RiToolsLine /> },
   ];
+
+export const buttonData2 = [
+    { label: "DashBoard", icon: <RiDashboardLine /> },
+    { label: "Report Incidents", icon: <RiAlertLine /> },
+    { label: "Tanod Personels", icon: <RiUserStarLine /> },
+    ];
