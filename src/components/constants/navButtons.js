@@ -10,7 +10,7 @@ export const buttonData = [
   ];
 
 export const buttonData2 = [
-    { label: "DashBoard", icon: <RiDashboardLine /> },
+    { label: "Home", icon: <RiDashboardLine /> },
     { label: "Report Incidents", icon: <RiAlertLine /> },
-    { label: "Tanod Personels", icon: <RiUserStarLine /> },
+    { label: "Rate Tanod", icon: <RiUserStarLine /> },
     ];

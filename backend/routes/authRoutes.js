@@ -7,6 +7,11 @@ const {
   loginTanod,
   getUserProfile,
   updateUserProfile,
+  getAllUserProfiles,
+  rateTanod,
+  getTanodRatings,
+  getUserRatings,
+  deleteRating,
   changePassword
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
@@ -21,21 +26,26 @@ router.post('/register', [
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ], registerUser);
 
-// User login route
-// authRoutes.js
-// User login routes
+
 router.post('/login/resident', loginResident); // For residents
 
-router.post('/login/tanod', loginTanod);       // For Tanods
+router.post('/login/tanod', loginTanod); // For Tanods
 
+router.get('/users', protect, getAllUserProfiles); //Get all user profile
 
-// Get current user profile
-router.get('/me', protect, getUserProfile);
+router.get('/me', protect, getUserProfile); // Get current user profile
 
-// Update user profile
-router.put('/update', protect, updateUserProfile);
+router.put('/update', protect, updateUserProfile); // Update user profile
 
-// Change user password
-router.put('/change-password', protect, changePassword);
+router.put('/change-password', protect, changePassword); // Change user password
+
+router.post('/:tanodId/rate', protect, rateTanod); //Upload tanod rating
+
+router.get('/:tanodId/ratings', protect, getTanodRatings);// Route to get ratings for a specific Tanod
+
+router.get('/my-ratings', protect, getUserRatings);  // Get current user's ratings
+
+router.delete('/ratings/:ratingId', protect, deleteRating);  // Delete a rating
+
 
 module.exports = router;

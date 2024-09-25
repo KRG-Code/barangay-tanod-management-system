@@ -1,6 +1,7 @@
 // authController.js
 const User = require('../models/User');
 const Equipment = require("../models/Equipment");
+const TanodRating=require('../models/Rating');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
@@ -26,6 +27,21 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Get all user profiles
+exports.getAllUserProfiles = async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // Exclude passwords
+    if (!users.length) return res.status(404).json({ message: 'No users found' });
+    
+    // Return the user data
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching all user profiles:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 
 // Get current user profile
 exports.getUserProfile = async (req, res) => {
@@ -57,30 +73,26 @@ exports.updateUserProfile = async (req, res) => {
   }
 };
 
-// Login an existing user
 exports.loginResident = async (req, res) => {
   const { email, password } = req.body; // Extract email and password from request body
   try {
     // Find user by email
     const user = await User.findOne({ email });
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // Check if user is a resident
-      if (user.userType !== 'resident') {
-        return res.status(401).json({ message: 'Unauthorized:You are not registered as a resident' });
-      }
 
-      // Login successful, send back user data and token
+    // Verify password and user type
+    if (user && (await bcrypt.compare(password, user.password)) && user.userType === 'resident') {
       return res.json({
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        username: user.username,
         email: user.email,
-        token: generateToken(user._id),
-        profilePicture: user.profilePicture
+        userType: user.userType,
+        token: generateToken(user._id),  // Use the generateToken function
+        profilePicture: user.profilePicture,
       });
     }
-    // If email or password is incorrect
+
+    // Invalid credentials
     res.status(401).json({ message: 'Invalid email or password' });
   } catch (error) {
     console.error('Login Error:', error.message);
@@ -92,30 +104,28 @@ exports.loginTanod = async (req, res) => {
   const { username, password } = req.body; // Extract username and password from request body
   try {
     const user = await User.findOne({ username }); // Find user by username
-    console.log(user); // Add this line to see what user object is returned
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // Check if user is a tanod
-      if (user.userType !== 'tanod') {
-        return res.status(401).json({ message: 'Unauthorized: Not a Tanod' });
-      }
-
+    // Verify password and user type
+    if (user && (await bcrypt.compare(password, user.password)) && user.userType === 'tanod') {
       return res.json({
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        username: user.username,
         email: user.email,
-        token: generateToken(user._id),
-        profilePicture: user.profilePicture
+        userType: user.userType,
+        token: generateToken(user._id),  // Use the generateToken function
+        profilePicture: user.profilePicture,
       });
     }
+
+    // Invalid credentials
     res.status(401).json({ message: 'Invalid username or password' });
   } catch (error) {
     console.error('Login Error:', error.message);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 // Change Password
 exports.changePassword = async (req, res) => {
@@ -181,5 +191,111 @@ exports.updateEquipment = async (req, res) => {
     res.json(updatedEquipment);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.rateTanod = async (req, res) => {
+  const { tanodId } = req.params;
+  const { rating, comment } = req.body;
+
+  if (!rating || !comment || rating < 1 || rating > 5) {
+    return res.status(400).json({ message: 'Invalid rating or comment' });
+  }
+
+  try {
+    // Check if the user has already rated the Tanod
+    let existingRating = await TanodRating.findOne({ tanodId, userId: req.user._id });
+
+    if (existingRating) {
+      // Update existing rating
+      existingRating.rating = rating;
+      existingRating.comment = comment;
+      await existingRating.save();
+      return res.status(200).json({ message: 'Rating updated successfully' });
+    } else {
+      // Create a new rating if none exists
+      const newRating = new TanodRating({
+        tanodId,
+        userId: req.user._id,
+        rating,
+        comment,
+      });
+
+      await newRating.save();
+      return res.status(201).json({ message: 'Rating submitted successfully' });
+    }
+  } catch (error) {
+    console.error('Error saving rating:', error);
+    res.status(500).json({ message: 'Error submitting rating' });
+  }
+};
+
+// Get ratings by the logged-in user
+exports.getUserRatings = async (req, res) => {
+  try {
+    const ratings = await TanodRating.find({ userId: req.user._id }).populate('tanodId', 'firstName lastName');
+    
+    if (!ratings.length) {
+      return res.status(404).json({ message: 'No ratings found' });
+    }
+    
+    res.json(ratings);
+  } catch (error) {
+    console.error('Error fetching user ratings:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Delete rating by the logged-in user
+exports.deleteRating = async (req, res) => {
+  try {
+    const rating = await TanodRating.findOneAndDelete({ _id: req.params.ratingId, userId: req.user._id });
+    
+    if (!rating) {
+      return res.status(404).json({ message: 'Rating not found or you do not have permission to delete this rating' });
+    }
+    
+    res.json({ message: 'Rating deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting rating:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get Tanod ratings
+exports.getTanodRatings = async (req, res) => {
+  const { tanodId } = req.params;
+
+  try {
+    const ratings = await TanodRating.find({ tanodId })
+      .populate('userId', 'firstName lastName') // Populate userId with firstName and lastName
+      .select('rating comment createdAt userId'); // Select fields
+
+    if (!ratings.length) {
+      return res.status(404).json({ message: 'No ratings found for this Tanod.' });
+    }
+
+    const overallRating = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+    const ratingCounts = [0, 0, 0, 0, 0]; // For ratings 1-5
+
+    ratings.forEach(r => {
+      ratingCounts[r.rating - 1]++;
+    });
+
+    // Map the ratings to include userId and comment
+    const commentsWithUser = ratings.map(r => ({
+      userId: r.userId._id, // Include the user's ID
+      fullName: `${r.userId.firstName} ${r.userId.lastName}`, // Construct full name
+      comment: r.comment, // Comment
+    }));
+
+    res.json({
+      overallRating: overallRating.toFixed(1), // Round to one decimal
+      ratingCounts,
+      comments: commentsWithUser, // Return the structured comments
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching ratings', error: error.message });
   }
 };

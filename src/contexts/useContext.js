@@ -1,18 +1,28 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; 
 
 export const CombinedContext = createContext();
 
 export const CombinedProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [userType, setUserType] = useState(null); // State to store userType
   const navigate = useNavigate();
+  
+  // State for token and userType
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [userType, setUserType] = useState(() => localStorage.getItem('userType'));
 
+  // State for dark mode and side nav
+  const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('theme') === 'dark');
+  const [isOpen, setIsOpen] = useState(false);
+  
   // Fetch user data to get userType
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      if (!token) {
+        setUserType(null);
+        return;
+      }
 
       const response = await fetch('http://localhost:5000/api/auth/me', {
         method: 'GET',
@@ -23,38 +33,44 @@ export const CombinedProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        setUserType(data.userType); // Set userType from fetched data
+        setUserType(data.userType);
+        localStorage.setItem('userType', data.userType); // Persist userType
       } else {
-        console.error('Failed to fetch user data');
+        setUserType(null);
+        localStorage.removeItem('userType'); // Clear userType if session expired
+        toast.error('Session expired. Please log in again.');
       }
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      toast.error('Error fetching user data');
+      setUserType(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    setToken(localStorage.getItem('token'));
     if (token) {
-      fetchData(); // Fetch user type on token change or mount
+      fetchData();
     }
-  }, [token]);
+  }, [token, fetchData]);
 
-  // Logout function clears token and userType
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUserType(null); // Clear userType on logout
-    navigate('/');
+  const login = async (newToken) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    await fetchData();
   };
 
-  const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('theme') === 'dark');
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userType'); // Clear userType on logout
+    setToken(null);
+    setUserType(null);
+    navigate('/');
+  };
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', isDarkMode);
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  const [isOpen, setIsOpen] = useState(false);
   const toggleSideNav = () => setIsOpen((prev) => !prev);
   const closeSideNav = () => setIsOpen(false);
 
@@ -62,8 +78,8 @@ export const CombinedProvider = ({ children }) => {
     <CombinedContext.Provider
       value={{
         token,
-        setToken,
-        userType, // Add userType to context
+        userType,
+        login,
         logout,
         isDarkMode,
         toggleTheme: () => setIsDarkMode(prev => !prev),

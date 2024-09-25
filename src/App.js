@@ -1,9 +1,9 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/layout/Layout"; 
+import Layout from "./components/layout/Layout";
 import { CombinedProvider } from "./contexts/useContext";
-import { ToastContainer } from "react-toastify"; 
-import ProtectedRoute from "./utils/ProtectedRoute"; // Import the ProtectedRoute
+import { ToastContainer } from "react-toastify";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 const SelectionPage = lazy(() => import("./pages/SelectionPage"));
 const SignupPage = lazy(() => import("./pages/Signup"));
@@ -19,8 +19,9 @@ const Schedule = lazy(() => import("./components/users/tanods/Schedule"));
 const Incidents = lazy(() => import("./components/users/tanods/Incidents"));
 const MyAccount = lazy(() => import("./components/users/tanods/MyAcc"));
 
-// Resident routes (example for future)
-const ResidentDashboard = lazy(() => import("./components/users/residents/Dashboard"));
+// Resident routes
+const ResidentRating = lazy(() => import("./components/users/residents/TanodPersonels"));
+const Home= lazy(() => import("./components/users/residents/Home"));
 
 function App() {
   return (
@@ -35,76 +36,49 @@ function App() {
               <Route path="/tanod-login" element={<LoginTanod />} />
               <Route path="/resident-login" element={<LoginResident />} />
               <Route path="/signup" element={<SignupPage />} />
-
+              <Route element={<Layout />}>
+              <Route path="/myaccount" element={<MyAccount />}/>
+              </Route>
               {/* Protected Routes for Tanod */}
               <Route element={<Layout />}>
                 <Route
                   path="/dashboard"
-                  element={
-                    <ProtectedRoute userTypeAllowed={["tanod"]}>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute userTypeAllowed={["tanod"]}><Dashboard /></ProtectedRoute>}
                 />
                 <Route
                   path="/patrolmap"
-                  element={
-                    <ProtectedRoute userTypeAllowed={["tanod"]}>
-                      <Patrolmap />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute userTypeAllowed={["tanod"]}><Patrolmap /></ProtectedRoute>}
                 />
                 <Route
                   path="/equipments"
-                  element={
-                    <ProtectedRoute userTypeAllowed={["tanod"]}>
-                      <Equipments />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute userTypeAllowed={["tanod"]}><Equipments /></ProtectedRoute>}
                 />
                 <Route
                   path="/performance"
-                  element={
-                    <ProtectedRoute userTypeAllowed={["tanod"]}>
-                      <Performance />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute userTypeAllowed={["tanod"]}><Performance /></ProtectedRoute>}
                 />
                 <Route
                   path="/schedule"
-                  element={
-                    <ProtectedRoute userTypeAllowed={["tanod"]}>
-                      <Schedule />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute userTypeAllowed={["tanod"]}><Schedule /></ProtectedRoute>}
                 />
                 <Route
                   path="/incidents"
-                  element={
-                    <ProtectedRoute userTypeAllowed={["tanod"]}>
-                      <Incidents />
-                    </ProtectedRoute>
-                  }
+                  element={<ProtectedRoute userTypeAllowed={["tanod"]}><Incidents /></ProtectedRoute>}
                 />
-                <Route
-                  path="/myaccount"
-                  element={
-                    <ProtectedRoute userTypeAllowed={["tanod"]}>
-                      <MyAccount />
-                    </ProtectedRoute>
-                  }
-                />
+                
               </Route>
 
-              {/* Future Protected Routes for Residents */}
-              <Route
-                path="/resident-dashboard"
-                element={
-                  <ProtectedRoute userTypeAllowed={["resident"]}>
-                    <ResidentDashboard />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Protected Routes for Residents */}
+              <Route element={<Layout />}>
+                <Route
+                  path="/home"
+                  element={<ProtectedRoute userTypeAllowed={["resident"]}><Home /></ProtectedRoute>}
+                />
+                <Route
+                  path="/ratetanod"
+                  element={<ProtectedRoute userTypeAllowed={["resident"]}><ResidentRating /></ProtectedRoute>}
+                />
+              </Route>
             </Routes>
           </Suspense>
         </CombinedProvider>

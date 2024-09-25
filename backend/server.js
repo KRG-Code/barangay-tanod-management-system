@@ -41,6 +41,10 @@ app.use('/api/auth', authRoutes);
 const equipmentRoutes = require('./routes/authEquipment');
 app.use('/api/equipments', equipmentRoutes);
 
+// Tanod Rating Routes
+const tanodRatingRoutes = require('./routes/authRoutes');
+app.use('/api/tanods', tanodRatingRoutes); // Add this line for Tanod ratings
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
