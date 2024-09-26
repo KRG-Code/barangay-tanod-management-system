@@ -14,3 +14,9 @@ export const buttonData2 = [
     { label: "Report Incidents", icon: <RiAlertLine /> },
     { label: "Rate Tanod", icon: <RiUserStarLine /> },
     ];
+
+    export const buttonData3 = [
+      { label: "Admin Dashboard", icon: <RiDashboardLine /> },
+      { label: "Manage Tanod", icon: <RiAlertLine /> },
+      { label: "Incedent Report", icon: <RiUserStarLine /> },
+      ];

@@ -106,7 +106,7 @@ exports.loginTanod = async (req, res) => {
     const user = await User.findOne({ username }); // Find user by username
 
     // Verify password and user type
-    if (user && (await bcrypt.compare(password, user.password)) && user.userType === 'tanod') {
+    if (user && (await bcrypt.compare(password, user.password)) && user.userType === 'tanod' || user.userType === 'admin') {
       return res.json({
         _id: user._id,
         firstName: user.firstName,
@@ -194,41 +194,45 @@ exports.updateEquipment = async (req, res) => {
   }
 };
 
+//Rate and edit rating tanod
 exports.rateTanod = async (req, res) => {
   const { tanodId } = req.params;
-  const { rating, comment } = req.body;
+  const { rating, comment, ratingId } = req.body; // Accept `ratingId` for editing
 
   if (!rating || !comment || rating < 1 || rating > 5) {
     return res.status(400).json({ message: 'Invalid rating or comment' });
   }
 
   try {
-    // Check if the user has already rated the Tanod
-    let existingRating = await TanodRating.findOne({ tanodId, userId: req.user._id });
+    // If `ratingId` is provided, update the existing rating
+    if (ratingId) {
+      const existingRating = await TanodRating.findById(ratingId);
+      if (!existingRating) {
+        return res.status(404).json({ message: 'Rating not found' });
+      }
 
-    if (existingRating) {
-      // Update existing rating
       existingRating.rating = rating;
       existingRating.comment = comment;
       await existingRating.save();
-      return res.status(200).json({ message: 'Rating updated successfully' });
-    } else {
-      // Create a new rating if none exists
-      const newRating = new TanodRating({
-        tanodId,
-        userId: req.user._id,
-        rating,
-        comment,
-      });
-
-      await newRating.save();
-      return res.status(201).json({ message: 'Rating submitted successfully' });
+      return res.status(200).json({ message: 'Rating updated successfully', updatedRating: existingRating });
     }
+
+    // Create a new rating if `ratingId` is not provided
+    const newRating = new TanodRating({
+      tanodId,
+      userId: req.user._id,
+      rating,
+      comment,
+    });
+
+    await newRating.save();
+    return res.status(201).json({ message: 'Rating submitted successfully', newRating });
   } catch (error) {
     console.error('Error saving rating:', error);
     res.status(500).json({ message: 'Error submitting rating' });
   }
 };
+
 
 // Get ratings by the logged-in user
 exports.getUserRatings = async (req, res) => {

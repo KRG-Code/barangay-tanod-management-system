@@ -10,6 +10,9 @@ const SignupPage = lazy(() => import("./pages/Signup"));
 const LoginTanod = lazy(() => import("./pages/LoginTanod"));
 const LoginResident = lazy(() => import("./pages/ResidentLogin"));
 
+//Admin routes
+const AdminDashboard = lazy(() => import("./components/users/admin/AdminDashboard"));
+
 // Tanod routes
 const Dashboard = lazy(() => import("./components/users/tanods/Dashboard"));
 const Patrolmap = lazy(() => import("./components/users/tanods/Map"));
@@ -79,6 +82,15 @@ function App() {
                   element={<ProtectedRoute userTypeAllowed={["resident"]}><ResidentRating /></ProtectedRoute>}
                 />
               </Route>
+              
+              {/* Protected Routes for Admin */}
+              <Route element={<Layout />}>
+                <Route
+                  path="/admindashboard"
+                  element={<ProtectedRoute userTypeAllowed={["admin"]}><AdminDashboard /></ProtectedRoute>}
+                />
+              </Route>
+
             </Routes>
           </Suspense>
         </CombinedProvider>

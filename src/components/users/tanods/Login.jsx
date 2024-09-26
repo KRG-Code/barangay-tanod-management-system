@@ -19,7 +19,7 @@ export default function LoginTanod() {
   const [loginState, setLoginState] = useState(fieldsState);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const { login } = useCombinedContext(); // Use login function from context
+  const { login } = useCombinedContext();
   const navigate = useNavigate();
 
   const handleChange = e => {
@@ -45,16 +45,27 @@ export default function LoginTanod() {
       });
       const data = await response.json();
 
+      console.log('Login response:', data); // Add this for debugging
+
       if (response.ok) {
         // Call login from context to set token and fetch user data
         await login(data.token);
 
-        toast.success('Logged in successfully!');
-        navigate('/dashboard');
+        // Handle navigation based on userType
+        if (data.userType === 'admin') {
+          toast.success('Logged in as Admin!');
+          navigate('/admindashboard'); // Admin dashboard
+        } else if (data.userType === 'tanod') {
+          toast.success('Logged in successfully as Tanod!');
+          navigate('/dashboard'); // Tanod dashboard
+        } else {
+          toast.error('Unauthorized user type');
+        }
       } else {
         toast.error(data.message || 'Invalid login credentials');
       }
-    } catch {
+    } catch (error) {
+      console.error('Login Error:', error); // Log error for debugging
       toast.error('An error occurred. Please try again.');
     } finally {
       setLoading(false);

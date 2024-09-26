@@ -9,6 +9,7 @@ export default function TanodPersonels() {
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [ratings, setRatings] = useState([]); // State for user's previous ratings
+  const [editingRatingId, setEditingRatingId] = useState(null); // Track if editing an existing rating
 
   // Fetch tanods list
   useEffect(() => {
@@ -69,13 +70,14 @@ export default function TanodPersonels() {
           }
         );
 
-        if (!response.ok) {
+        if (response.ok) {
+          const ratings = await response.json();
+          setRatings(ratings); // Store the user's ratings in state
+        } else if (response.status === 404) {
+          setRatings([]); // Handle case where no ratings are found
+        } else {
           throw new Error("Error fetching user ratings");
         }
-
-        const ratings = await response.json();
-        console.log("User Ratings:", ratings);
-        setRatings(ratings); // Store the user's ratings in state
       } catch (error) {
         console.error("Error fetching user ratings:", error);
         toast.error("Error fetching user ratings.");
@@ -109,6 +111,7 @@ export default function TanodPersonels() {
           body: JSON.stringify({
             rating,
             comment,
+            ratingId: editingRatingId, // Send `ratingId` if editing
           }),
         }
       );
@@ -116,10 +119,27 @@ export default function TanodPersonels() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Rating and comment submitted successfully");
+        if (editingRatingId) {
+          toast.success("Rating updated successfully");
+
+          // Update the rating in the state
+          setRatings((prevRatings) =>
+            prevRatings.map((r) =>
+              r._id === editingRatingId ? data.updatedRating : r
+            )
+          );
+        } else {
+          toast.success("Rating and comment submitted successfully");
+
+          // Add the newly submitted rating to the state
+          setRatings((prevRatings) => [...prevRatings, data.newRating]);
+        }
+
+        // Reset the form
         setSelectedTanod("");
         setRating(0);
         setComment("");
+        setEditingRatingId(null); // Reset editing state
       } else {
         toast.error(data.message || "Failed to submit rating");
       }
@@ -130,40 +150,70 @@ export default function TanodPersonels() {
     }
   };
 
-  const deleteRating = async (ratingId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this rating?"
-    );
-    if (!confirmDelete) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:5000/api/auth/ratings/${ratingId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+  const deleteRating = (ratingId) => {
+    const confirmDelete = async (confirmed) => {
+      if (confirmed) {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(
+            `http://localhost:5000/api/auth/ratings/${ratingId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+  
+          if (response.ok) {
+            toast.success("Rating deleted successfully");
+            setRatings(ratings.filter((rating) => rating._id !== ratingId)); // Update the state
+          } else {
+            toast.error("Failed to delete rating");
+          }
+        } catch (error) {
+          console.error("Error deleting rating:", error);
+          toast.error("Error deleting rating");
         }
-      );
-
-      if (response.ok) {
-        toast.success("Rating deleted successfully");
-        setRatings(ratings.filter((rating) => rating._id !== ratingId)); // Update the state
-      } else {
-        toast.error("Failed to delete rating");
       }
-    } catch (error) {
-      console.error("Error deleting rating:", error);
-      toast.error("Error deleting rating");
-    }
+    };
+  
+    toast.info(
+      <div>
+        <p>Are you sure you want to delete this rating?</p>
+        <button
+          onClick={() => {
+            confirmDelete(true);
+            toast.dismiss(); // Dismiss the toast
+          }}
+          className="bg-red-500 text-white px-2 py-1 rounded mr-2"
+        >
+          Yes
+        </button>
+        <button
+          onClick={() => {
+            confirmDelete(false);
+            toast.dismiss(); // Dismiss the toast
+          }}
+          className="bg-gray-500 text-white px-2 py-1 rounded"
+        >
+          No
+        </button>
+      </div>,
+      {
+        autoClose: false, // Keep it open until dismissed
+        closeButton: false, // Disable the default close button
+        position: "top-right",
+      }
+    );
   };
+  
 
   const editRating = (rating) => {
     setSelectedTanod(rating.tanodId._id);
     setRating(rating.rating);
     setComment(rating.comment);
+    setEditingRatingId(rating._id); // Set the ratingId for editing
   };
 
   return (
@@ -305,6 +355,18 @@ export default function TanodPersonels() {
             disabled={loading}
           >
             {loading ? "Submitting..." : "Submit Rating"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedTanod("");
+              setRating(0);
+              setComment("");
+              setEditingRatingId(null); // Reset editing state
+            }}
+            className="bg-gray-500 text-white px-4 py-2 rounded ml-2 hover:bg-gray-600"
+          >
+            Cancel
           </button>
         </form>
       )}

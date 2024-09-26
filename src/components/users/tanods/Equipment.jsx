@@ -14,6 +14,10 @@ const Equipment = () => {
   const [showForm, setShowForm] = useState(false);
   const [newItem, setNewItem] = useState({ name: "", image: null });
   const [imagePreview, setImagePreview] = useState(null);
+  
+  // Filter states
+  const [showReturned, setShowReturned] = useState(false);
+  const [filterDate, setFilterDate] = useState("");
 
   const baseURL = "http://localhost:5000"; // Adjust based on your backend server port
 
@@ -120,24 +124,22 @@ const Equipment = () => {
   const confirmReturn = async (index) => {
     try {
       const itemToReturn = items[index];
-      console.log("Returning item:", itemToReturn); // Check if the ID exists
-    
+
       if (!itemToReturn._id) {
         toast.error("Invalid item ID. Please try again.");
         return;
       }
-    
-      // Get the current date and time
+
       const currentDateTime = new Date().toISOString();
-    
+
       const updatedItem = {
-        returnDate: currentDateTime, // Set return date to current date and time
+        returnDate: currentDateTime,
       };
-    
+
       const token = localStorage.getItem("token");
-    
+
       const response = await axios.put(
-        `${baseURL}/api/equipments/${itemToReturn._id}`, // Ensure this ID is correct
+        `${baseURL}/api/equipments/${itemToReturn._id}`,
         updatedItem,
         {
           headers: {
@@ -145,7 +147,7 @@ const Equipment = () => {
           },
         }
       );
-    
+
       const updatedItems = [...items];
       updatedItems[index] = response.data;
       setItems(updatedItems);
@@ -156,22 +158,42 @@ const Equipment = () => {
       toast.error("Error returning equipment. Please try again.");
     }
   };
-  
-  
-  
 
   const formatDate = (date) => {
-    const notReturnedDate = "1970-01-01T00:00:00.000Z"; // Use UTC format for comparison
+    const notReturnedDate = "1970-01-01T00:00:00.000Z";
     if (date === notReturnedDate) {
-      return <span className="text-red-500">Not Yet Returned</span>; // Show this if returnDate is the default date
+      return <span className="text-red-500">Not Yet Returned</span>;
     }
     return dayjs(date).format("hh:mm A DD-MM-YYYY");
   };
+
+  // Filtered items logic
+  const filteredItems = items.filter(item => 
+    (showReturned ? item.returnDate !== "1970-01-01T00:00:00.000Z" : item.returnDate === "1970-01-01T00:00:00.000Z") &&
+    (!filterDate || dayjs(item.returnDate).isSame(dayjs(filterDate), 'day'))
+  );
 
   return (
     <div className="container mx-auto p-5">
       <ToastContainer />
       <h1 className="text-3xl font-bold mb-6">Equipment</h1>
+
+      <div className="flex justify-between mb-4">
+        <div>
+          <button onClick={() => setShowReturned(false)} className={`py-2 px-4 ${!showReturned ? "TopNav focus:outline-none focus:ring-1 focus:ring-blue5 " : "TopNav"}`}>
+            Currently Borrowed
+          </button>
+          <button onClick={() => setShowReturned(true)} className={`py-2 px-4 ml-1 ${showReturned ? "TopNav focus:outline-none focus:ring-1 focus:ring-blue5" : "TopNav"}`}>
+            Returned Items
+          </button>
+        </div>
+        <input
+          type="date"
+          value={filterDate}
+          onChange={(e) => setFilterDate(e.target.value)}
+          className="border border-gray-300 p-2 rounded TopNav"
+        />
+      </div>
 
       <div className="flex justify-end mb-4">
         <button
@@ -241,14 +263,14 @@ const Equipment = () => {
             </tr>
           </thead>
           <tbody>
-            {items.length === 0 ? (
+            {filteredItems.length === 0 ? (
               <tr>
                 <td colSpan="5" className="text-center py-4">
-                  No borrowed items.
+                  No items found.
                 </td>
               </tr>
             ) : (
-              items.map((item, index) => (
+              filteredItems.map((item, index) => (
                 <tr key={index} className="border-b text-black text-center">
                   <td className="py-2 px-4">{item.name}</td>
                   <td className="py-2 px-4">{formatDate(item.borrowDate)}</td>

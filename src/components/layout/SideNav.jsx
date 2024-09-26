@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { RiGovernmentFill } from "react-icons/ri";
-import { buttonData, buttonData2 } from "../constants/navButtons";
+import { buttonData, buttonData2, buttonData3 } from "../constants/navButtons";
 import { NavLink } from "react-router-dom";
 import { useCombinedContext } from "../../contexts/useContext";
 
@@ -43,6 +43,9 @@ export default function SideNav() {
       setNavButtons(buttonData); // Set tanod-specific buttons
     } else if (userType === "resident") {
       setNavButtons(buttonData2); // Set resident-specific buttons
+    }
+    else if (userType === "admin") {
+      setNavButtons(buttonData3); // Set resident-specific buttons
     }
   }, [userType]);
 
