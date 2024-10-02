@@ -19,7 +19,7 @@ const Equipment = () => {
   const [showReturned, setShowReturned] = useState(false);
   const [filterDate, setFilterDate] = useState("");
 
-  const baseURL = "http://localhost:5000"; // Adjust based on your backend server port
+  const baseURL = `${process.env.REACT_APP_API_URL}`; // Adjust based on your backend server port
 
   useEffect(() => {
     const fetchEquipments = async () => {
@@ -30,7 +30,7 @@ const Equipment = () => {
           return;
         }
 
-        const response = await axios.get(`${baseURL}/api/equipments`, {
+        const response = await axios.get(`${baseURL}/equipments`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,7 +77,7 @@ const Equipment = () => {
 
       const token = localStorage.getItem("token");
 
-      const response = await axios.post(`${baseURL}/api/equipments`, formData, {
+      const response = await axios.post(`${baseURL}/equipments`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -139,7 +139,7 @@ const Equipment = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.put(
-        `${baseURL}/api/equipments/${itemToReturn._id}`,
+        `${baseURL}/equipments/${itemToReturn._id}`,
         updatedItem,
         {
           headers: {

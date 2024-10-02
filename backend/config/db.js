@@ -7,10 +7,8 @@ const connectDB = async () => {
 
   while (retries < maxRetries) {
     try {
-      await mongoose.connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
+      // Remove useNewUrlParser and useUnifiedTopology options
+      await mongoose.connect(process.env.MONGO_URI);
       console.log('MongoDB connected');
       break; // Exit the loop if the connection is successful
     } catch (error) {

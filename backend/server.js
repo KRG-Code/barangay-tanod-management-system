@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const admin = require('firebase-admin');
+const notificationRoutes = require('./routes/notificationRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 dotenv.config();
 const app = express();
@@ -44,6 +46,9 @@ app.use('/api/equipments', equipmentRoutes);
 // Tanod Rating Routes
 const tanodRatingRoutes = require('./routes/authRoutes');
 app.use('/api/tanods', tanodRatingRoutes); // Add this line for Tanod ratings
+
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/messages', messageRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

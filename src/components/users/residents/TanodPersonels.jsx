@@ -21,7 +21,7 @@ export default function TanodPersonels() {
       }
 
       try {
-        const response = await fetch("http://localhost:5000/api/auth/users", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/users`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ export default function TanodPersonels() {
 
       try {
         const response = await fetch(
-          "http://localhost:5000/api/auth/my-ratings",
+          `${process.env.REACT_APP_API_URL}/auth/my-ratings`,
           {
             method: "GET",
             headers: {
@@ -101,7 +101,7 @@ export default function TanodPersonels() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/tanods/${selectedTanod}/rate`,
+        `${process.env.REACT_APP_API_URL}/tanods/${selectedTanod}/rate`,
         {
           method: "POST",
           headers: {
@@ -156,7 +156,7 @@ export default function TanodPersonels() {
         try {
           const token = localStorage.getItem("token");
           const response = await fetch(
-            `http://localhost:5000/api/auth/ratings/${ratingId}`,
+            `${process.env.REACT_APP_API_URL}/auth/ratings/${ratingId}`,
             {
               method: "DELETE",
               headers: {
@@ -230,9 +230,9 @@ export default function TanodPersonels() {
             <th className="py-2 px-4 border-b text-center">Action</th>
           </tr>
         </thead>
-        <tbody className="bg-white">
+        <tbody className="bg-white TopNav">
           {tanods.map((tanod) => (
-            <tr key={tanod._id} className="hover:bg-gray-100">
+            <tr key={tanod._id} className="hover:cursor-pointer">
               <td className="py-2 px-4 border-b text-center">
                 <img
                   src={tanod.profilePicture || "/default-user-icon.png"}
@@ -240,7 +240,7 @@ export default function TanodPersonels() {
                   className="w-12 h-12 rounded-full mx-auto"
                 />
               </td>
-              <td className="py-2 px-4 border-b text-center text-black">
+              <td className="py-2 px-4 border-b text-center">
                 {tanod.firstName} {tanod.lastName}
               </td>
               <td className="py-2 px-4 border-b text-center">

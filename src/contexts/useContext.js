@@ -24,7 +24,7 @@ export const CombinedProvider = ({ children }) => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/me', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/me`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

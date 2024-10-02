@@ -12,6 +12,9 @@ const LoginResident = lazy(() => import("./pages/ResidentLogin"));
 
 //Admin routes
 const AdminDashboard = lazy(() => import("./components/users/admin/AdminDashboard"));
+const ManageTanod = lazy(() => import("./components/users/admin/Personels"));
+const Resources = lazy(() => import("./components/users/admin/Resources"));
+const ManageSchedule = lazy(() => import("./components/users/admin/ManageSchedule"));
 
 // Tanod routes
 const Dashboard = lazy(() => import("./components/users/tanods/Dashboard"));
@@ -89,7 +92,20 @@ function App() {
                   path="/admindashboard"
                   element={<ProtectedRoute userTypeAllowed={["admin"]}><AdminDashboard /></ProtectedRoute>}
                 />
+                <Route
+                  path="/ManageTanod"
+                  element={<ProtectedRoute userTypeAllowed={["admin"]}><ManageTanod /></ProtectedRoute>}
+                />
+                <Route
+                  path="/Resources"
+                  element={<ProtectedRoute userTypeAllowed={["admin"]}><Resources /></ProtectedRoute>}
+                />
+                <Route
+                  path="/ManageSchedule"
+                  element={<ProtectedRoute userTypeAllowed={["admin"]}><ManageSchedule /></ProtectedRoute>}
+                />
               </Route>
+              
 
             </Routes>
           </Suspense>

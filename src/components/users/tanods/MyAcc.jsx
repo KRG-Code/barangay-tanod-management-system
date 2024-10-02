@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
-import { compressImage } from '../../../utils/ImageCompression';
-import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
-import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { compressImage } from "../../../utils/ImageCompression";
+import { toast, ToastContainer } from "react-toastify"; // Import Toastify
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase imports
 import { storage } from "../../../firebase"; // Firebase storage instance
 
@@ -34,7 +34,10 @@ export default function MyAcc() {
     const birthDate = new Date(birthday);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
@@ -49,7 +52,7 @@ export default function MyAcc() {
       }
 
       try {
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/me`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,30 +96,38 @@ export default function MyAcc() {
       try {
         // Compress the image file
         const compressedFile = await compressImage(file); // Make sure compressImage returns a Blob or File
-  
+
         // Create a URL for the compressed image to display
         const imageUrl = URL.createObjectURL(compressedFile);
         setLocalProfilePicture(imageUrl); // Set the temporary URL for preview
-        setAccountState((prevState) => ({ ...prevState, profilePicture: compressedFile })); // Store the compressed file for upload
+        setAccountState((prevState) => ({
+          ...prevState,
+          profilePicture: compressedFile,
+        })); // Store the compressed file for upload
         toast.success("Profile picture selected!");
       } catch (error) {
         toast.error("Error processing profile picture. Please try again.");
       }
     }
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const token = localStorage.getItem("token");
-  
+
     // If there's a local profile picture, upload it to Firebase
     let updatedProfilePictureURL = accountState.profilePicture; // This will be a compressed file object
     if (updatedProfilePictureURL) {
       try {
-        const storageRef = ref(storage, `userprofiles/${updatedProfilePictureURL.name}`); // Folder for user profiles
-        const snapshot = await uploadBytes(storageRef, updatedProfilePictureURL);
+        const storageRef = ref(
+          storage,
+          `userprofiles/${updatedProfilePictureURL.name}`
+        ); // Folder for user profiles
+        const snapshot = await uploadBytes(
+          storageRef,
+          updatedProfilePictureURL
+        );
         updatedProfilePictureURL = await getDownloadURL(snapshot.ref); // Get the Firebase URL
       } catch (error) {
         toast.error("Error uploading profile picture. Please try again.");
@@ -124,15 +135,15 @@ export default function MyAcc() {
         return; // Stop further execution if profile picture upload fails
       }
     }
-  
+
     // Update the account state with the new profile picture URL (if it was changed)
-    const updatedAccountState = { 
-      ...accountState, 
-      profilePicture: updatedProfilePictureURL 
+    const updatedAccountState = {
+      ...accountState,
+      profilePicture: updatedProfilePictureURL,
     };
-  
+
     try {
-      const response = await fetch("http://localhost:5000/api/auth/update", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/update`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +151,7 @@ export default function MyAcc() {
         },
         body: JSON.stringify(updatedAccountState),
       });
-  
+
       const data = await response.json();
       if (response.ok) {
         toast.success("Profile updated successfully!");
@@ -155,7 +166,6 @@ export default function MyAcc() {
       setLoading(false);
     }
   };
-  
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -166,7 +176,7 @@ export default function MyAcc() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/api/auth/change-password",
+        `${process.env.REACT_APP_API_URL}/auth/change-password`,
         {
           method: "PUT",
           headers: {
@@ -198,7 +208,11 @@ export default function MyAcc() {
         <div className="w-1/3">
           <div className="relative">
             <img
-              src={localProfilePicture || accountState.profilePicture || "/default-user-icon.png"}
+              src={
+                localProfilePicture ||
+                accountState.profilePicture ||
+                "/default-user-icon.png"
+              }
               alt="Profile"
               className="rounded-full w-32 h-32 object-cover border-2 border-gray-200"
             />
@@ -236,7 +250,7 @@ export default function MyAcc() {
                 <option value="None">❌ None</option>
                 <option value="Male">♂ Male</option>
                 <option value="Female">♀ Female</option>
-                <option value="Others">⚧ Others</option>  
+                <option value="Others">⚧ Others</option>
               </select>
             ) : (
               <span>{accountState.gender || "Not Specified"}</span>
@@ -269,13 +283,7 @@ export default function MyAcc() {
             <div className="text-lg">
               <span className="font-semibold">Full Name: </span>
               {isEditing ? (
-                <input
-                  type="text"
-                  id="firstName"
-                  value={accountState.firstName}
-                  onChange={handleChange}
-                  className="border px-2 py-1 text-black"
-                />
+                <span>{`${accountState.firstName} ${accountState.lastName}`}</span>
               ) : (
                 <span>{`${accountState.firstName} ${accountState.lastName}`}</span>
               )}
