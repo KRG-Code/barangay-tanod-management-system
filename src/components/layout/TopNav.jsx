@@ -4,19 +4,30 @@ import { RiUser3Line, RiMenuLine, RiMessage3Line, RiNotification3Line } from "re
 import ThemeToggle from "../forms/ThemeToggle";
 import { useCombinedContext } from "../../contexts/useContext";
 import NotificationList from "../notifications/NotificationList";
-import MessageList from "../messages/MessageList"; // Assuming you'll create a MessageList component similar to NotificationList
+import MessageList from "../messages/MessageList";
 
 export default function TopNav() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
-  const [showNotificationList, setShowNotificationList] = useState(false); // For notifications dropdown
-  const [showMessageList, setShowMessageList] = useState(false); // For messages dropdown
-  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // For unread notification badge
-  const dropdownRef = useRef(null); // For detecting outside clicks
-  const notificationRef = useRef(null); // For detecting outside clicks on notification
-  const messageRef = useRef(null); // For detecting outside clicks on message dropdown
+  const [showNotificationList, setShowNotificationList] = useState(false);
+  const [showMessageList, setShowMessageList] = useState(false);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const dropdownRef = useRef(null);
+  const notificationRef = useRef(null);
+  const messageRef = useRef(null);
   const navigate = useNavigate();
   const { toggleSideNav } = useCombinedContext();
+
+  // Handle click outside to close dropdowns
+  const handleClickOutside = (event) => {
+    if (
+      dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+      notificationRef.current && !notificationRef.current.contains(event.target) &&
+      messageRef.current && !messageRef.current.contains(event.target)
+    ) {
+      closeAllDropdowns();
+    }
+  };
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -31,7 +42,6 @@ export default function TopNav() {
         .catch((error) => console.error("Error fetching user data:", error));
     }
 
-    // Check for unread notifications
     checkUnreadNotifications();
 
     // Close dropdown when clicking outside
@@ -39,9 +49,8 @@ export default function TopNav() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, []); // No need to add handleClickOutside in dependencies as it's defined in the same scope
 
-  // Function to check if there are unread notifications
   const checkUnreadNotifications = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -60,16 +69,15 @@ export default function TopNav() {
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const toggleMessagesDropdown = () => {
     setShowMessageList(!showMessageList);
-    setShowNotificationList(false); // Close notification dropdown when opening messages
+    setShowNotificationList(false);
   };
 
   const toggleNotificationsDropdown = () => {
     setShowNotificationList(!showNotificationList);
-    setShowMessageList(false); // Close message dropdown when opening notifications
+    setShowMessageList(false);
     if (showNotificationList) markNotificationsAsRead();
   };
 
-  // Mark notifications as read when dropdown is opened
   const markNotificationsAsRead = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -82,17 +90,6 @@ export default function TopNav() {
       setHasUnreadNotifications(false);
     } catch (error) {
       console.error("Error marking notifications as read:", error);
-    }
-  };
-
-  // Handle click outside to close dropdowns
-  const handleClickOutside = (event) => {
-    if (
-      dropdownRef.current && !dropdownRef.current.contains(event.target) &&
-      notificationRef.current && !notificationRef.current.contains(event.target) &&
-      messageRef.current && !messageRef.current.contains(event.target)
-    ) {
-      closeAllDropdowns();
     }
   };
 
@@ -129,7 +126,6 @@ export default function TopNav() {
             </span>
           ))}
 
-          {/* Message Button with Dropdown */}
           <div className="relative" ref={messageRef}>
             <button onClick={toggleMessagesDropdown} className="text-2xl p-1" title="Messages">
               <RiMessage3Line />
@@ -137,7 +133,6 @@ export default function TopNav() {
             {showMessageList && <MessageList />}
           </div>
 
-          {/* Notification Button with Dropdown */}
           <div className="relative" ref={notificationRef}>
             <button onClick={toggleNotificationsDropdown} className="text-2xl p-1 relative" title="Notifications">
               <RiNotification3Line />
@@ -148,7 +143,6 @@ export default function TopNav() {
             {showNotificationList && <NotificationList onClose={toggleNotificationsDropdown} />}
           </div>
 
-          {/* Profile Picture and Account Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button onClick={toggleDropdown} className="text-2xl border-2 rounded-full p-1">
               {profilePicture ? (

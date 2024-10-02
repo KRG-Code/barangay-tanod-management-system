@@ -60,7 +60,7 @@ export default function SideNav() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [isOpen]);
+  }, [isOpen, closeSideNav]);
 
   const handleNavClick = () => {
     if (window.innerWidth <= 768) {
